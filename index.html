@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tushar Work Queries</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* GLOBAL STYLES SAME AS BEFORE */
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding-top:40px;color:white;transition:background 0.5s;}
+.dark-mode body{background:#121212;color:#fff;}
+.box{background:#fff;color:black;padding:30px;max-width:500px;width:90%;border-radius:15px;box-shadow:0 15px 35px rgba(0,0,0,0.25);animation:fadeIn 1s ease-in;margin-bottom:40px;}
+.dark-mode .box{background:#1e1e1e;color:#fff;box-shadow:0 10px 25px rgba(0,0,0,0.5);}
+h2{text-align:center;margin-bottom:20px;}
+input,textarea,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #ccc;font-size:16px;transition:0.3s;}
+input:focus,textarea:focus{border-color:#667eea;outline:none;}
+textarea{resize:vertical;}
+button{background:#667eea;color:#fff;border:none;cursor:pointer;font-weight:bold;margin-top:15px;}
+button:hover{background:#5a67d8;}
+.captcha{margin-top:12px;font-size:14px;}
+.query{border:1px solid #ddd;padding:12px;margin-top:10px;border-radius:8px;background:#f9f9f9;transition:0.3s;}
+.query:hover{background:#ececec;}
+.hidden{display:none;}
+img.logo{width:120px;display:block;margin:auto;margin-bottom:15px;}
+@keyframes fadeIn{0%{opacity:0;transform:translateY(-20px);}100%{opacity:1;transform:translateY(0);}}
+#darkToggle{margin-top:10px;background:#333;color:white;}
+#darkToggle:hover{background:#555;}
+#search{margin-top:10px;padding:10px;font-size:14px;border-radius:6px;}
+.success{background:#4CAF50;color:white;padding:10px;text-align:center;margin-top:10px;border-radius:6px;animation:fadeIn 0.5s;}
+</style>
+</head>
+<body>
+
+<!-- USER FORM BOX -->
+<div class="box" id="userBox">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAMAAACM/rhtAAAAP1BMVEUAAAD///+hoaH7+/v5+fnx8fGqqqr8/Pyjo6O5ubnBwcHc3Nzj4+Pd3d1GRkZ/f3/GxsaYmJi3t7eOjo4fHx82NjaL0pI9AAABG0lEQVR4nO3YwQ3AIBAF0GNG//+94ZjqwTiUkxntMn0aMGDBgwYMKBhz4B9D7Zp24W+5o7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mnf0LqYV3B3u4tKkAAAAASUVORK5CYII=" class="logo" alt="Tushar Logo">
+<h2>Submit Work Query</h2>
+<form id="queryForm">
+<input id="name" placeholder="Your Name" required>
+<input id="email" type="email" placeholder="Your Email" required>
+<input id="phone" type="tel" placeholder="Your Phone (+countrycode)" required>
+<input id="subject" placeholder="Subject" required>
+<textarea id="query" placeholder="Write your query..." required></textarea>
+<div class="captcha">
+<label><input type="checkbox" id="human" required> I am not a robot</label>
+</div>
+<button type="submit">Submit</button>
+<button type="button" onclick="showAdmin()">Admin Login</button>
+</form>
+<div id="successMsg" class="success hidden"></div>
+<button id="darkToggle" onclick="toggleDark()">Toggle Dark Mode</button>
+</div>
+
+<!-- ADMIN LOGIN BOX -->
+<div class="box hidden" id="loginBox">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAMAAACM/rhtAAAAP1BMVEUAAAD///+hoaH7+/v5+fnx8fGqqqr8/Pyjo6O5ubnBwcHc3Nzj4+Pd3d1GRkZ/f3/GxsaYmJi3t7eOjo4fHx82NjaL0pI9AAABG0lEQVR4nO3YwQ3AIBAF0GNG//+94ZjqwTiUkxntMn0aMGDBgwYMKBhz4B9D7Zp24W+5o7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mnf0LqYV3B3u4tKkAAAAASUVORK5CYII=" class="logo" alt="Tushar Logo">
+<h2>Admin Login</h2>
+<input id="user" placeholder="User ID">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<button type="button" onclick="showUser()">Back to Form</button>
+</div>
+
+<!-- DASHBOARD BOX -->
+<div class="box hidden" id="dashboard">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAMAAACM/rhtAAAAP1BMVEUAAAD///+hoaH7+/v5+fnx8fGqqqr8/Pyjo6O5ubnBwcHc3Nzj4+Pd3d1GRkZ/f3/GxsaYmJi3t7eOjo4fHx82NjaL0pI9AAABG0lEQVR4nO3YwQ3AIBAF0GNG//+94ZjqwTiUkxntMn0aMGDBgwYMKBhz4B9D7Zp24W+5o7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mjj1m7cfZrtUeM7a+mnf0LqYV3B3u4tKkAAAAASUVORK5CYII=" class="logo" alt="Tushar Logo">
+<h2>Admin Dashboard</h2>
+<input id="search" placeholder="Search queries by name/email/subject">
+<div id="queries"></div>
+<br>
+<button onclick="generatePDF()">Generate PDF</button>
+<button type="button" onclick="logout()">Logout</button>
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx6bXS1Sq1QS9qWPqDA-FftJt61nNlKdfFLJ98xfYn3msWdernfR-7QZ0xyNPWM3LHk/exec";
+
+// Dark mode
+function toggleDark(){document.body.classList.toggle("dark-mode");}
+
+// Store queries in memory
+let queriesList=[];
+
+// User submit
+document.getElementById("queryForm").onsubmit=async function(e){
+e.preventDefault();
+const n=name.value,eM=email.value,p=phone.value,s=subject.value,q=query.value;
+await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:n,email:eM,phone:p,subject:s,query:q})});
+document.getElementById("successMsg").innerHTML="✅ Query submitted successfully! Click below to notify via WhatsApp";
+document.getElementById("successMsg").classList.remove("hidden");
+
+// WhatsApp links
+const userLink=`https://wa.me/${p.replace(/\D/g,'')}?text=Hello ${encodeURIComponent(n)}, thank you for submitting your query. We will get back soon.`;
+const adminNumber="+916901140466";
+const adminLink=`https://wa.me/${adminNumber.replace(/\D/g,'')}?text=New query submitted by ${encodeURIComponent(n)} (${encodeURIComponent(eM)}) Subject: ${encodeURIComponent(s)}`;
+document.getElementById("successMsg").innerHTML+=`<br><a href="${userLink}" target="_blank"><button>Notify via WhatsApp (User)</button></a>
+<br><a href="${adminLink}" target="_blank"><button>Notify Admin via WhatsApp</button></a>`;
+
+document.getElementById("queryForm").reset();
+};
+
+// Switch boxes
+function showAdmin(){document.getElementById("userBox").classList.add("hidden");document.getElementById("loginBox").classList.remove("hidden");}
+function showUser(){document.getElementById("loginBox").classList.add("hidden");document.getElementById("userBox").classList.remove("hidden");}
+
+// Admin login
+function login(){
+const u=document.getElementById("user").value,p=document.getElementById("pass").value;
+if(u!=="tushar"||p!=="123"){alert("❌ Wrong ID or Password");return;}
+document.getElementById("loginBox").classList.add("hidden");
+document.getElementById("dashboard").classList.remove("hidden");
+fetchQueries();
+setInterval(fetchQueries,15000);
+}
+
+// Logout
+function logout(){document.getElementById("dashboard").classList.add("hidden");document.getElementById("loginBox").classList.remove("hidden");}
+
+// Fetch queries
+function fetchQueries(){
+fetch(SCRIPT_URL+"?action=login&user=tushar&pass=123").then(r=>r.text()).then(data=>{
+if(data==="DENIED"||data==="null"){return;}
+queriesList=JSON.parse(data);
+showQueries(queriesList);
+});
+}
+
+// Show queries
+function showQueries(list){
+const queriesDiv=document.getElementById("queries");
+const searchVal=document.getElementById("search").value.toLowerCase();
+const filtered=list.filter(q=>q.name.toLowerCase().includes(searchVal)||q.email.toLowerCase().includes(searchVal)||q.subject.toLowerCase().includes(searchVal));
+if(filtered.length===0){queriesDiv.innerHTML="<p>No queries found.</p>";return;}
+queriesDiv.innerHTML=filtered.map((q,i)=>`<div class="query"><b>Name:</b>${q.name}<br><b>Email:</b>${q.email}<br><b>Phone:</b>${q.phone}<br><b>Subject:</b>${q.subject}<br><b>Query:</b>${q.query}<br><b>Time:</b>${q.time}<br><button onclick="deleteQuery(${i})">Delete</button></div>`).join("");
+}
+
+// Delete query (front-end)
+function deleteQuery(index){if(confirm("Delete this query?")){queriesList.splice(index,1);showQueries(queriesList);alert("Query deleted (front-end). To delete backend, update Apps Script).");}}
+
+// Search live
+document.getElementById("search")?.addEventListener("input",()=>showQueries(queriesList));
+
+// Generate PDF offline
+function generatePDF(){
+if(!queriesList || queriesList.length===0){alert("No queries to export"); return;}
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+let y=10;
+doc.setFontSize(16);
+doc.text("Tushar Work Queries",105,10,{align:"center"});
+doc.setFontSize(12);
+queriesList.forEach((q,i)=>{
+y+=10;
+doc.text(`Name: ${q.name}`,10,y);
+y+=7;
+doc.text(`Email: ${q.email}`,10,y);
+y+=7;
+doc.text(`Phone: ${q.phone}`,10,y);
+y+=7;
+doc.text(`Subject: ${q.subject}`,10,y);
+y+=7;
+doc.text(`Query: ${q.query}`,10,y);
+y+=7;
+doc.text(`Time: ${q.time}`,10,y);
+y+=10;
+if(y>270){doc.addPage();y=10;}
+});
+doc.save("Tushar_Work_Queries.pdf");
+}
+</script>
+</body>
+</html>
