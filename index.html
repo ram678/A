@@ -19,7 +19,7 @@ body {
   background:#fff; color:black;
   padding:30px; max-width:500px; width:90%;
   border-radius:15px; box-shadow:0 15px 35px rgba(0,0,0,0.25);
-  animation:fadeIn 1s ease-in; margin-bottom:40px;
+  animation:fadeIn 0.8s ease-in; margin-bottom:40px;
 }
 .dark-mode .box { background:#1e1e1e; color:#fff; }
 h2 { text-align:center; margin-bottom:20px; }
@@ -93,7 +93,7 @@ img.logo { width:120px; display:block; margin:auto; margin-bottom:15px; }
 </div>
 
 <script>
-const SCRIPT_URL="YOUR_GOOGLE_APPS_SCRIPT_URL"; // replace with your actual script URL
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx6bXS1Sq1QS9qWPqDA-FftJt61nNlKdfFLJ98xfYn3msWdernfR-7QZ0xyNPWM3LHk/exec";
 let queriesList=[];
 
 // Dark mode toggle
@@ -167,5 +167,23 @@ function generatePDF(){
     doc.text(`Name: ${q.name}`,10,y); y+=7;
     doc.text(`Email: ${q.email}`,10,y); y+=7;
     doc.text(`Phone: ${q.phone}`,10,y); y+=7;
-    doc.text(`Subject: ${q.subject}`,10,y); y+=7;
-    doc.text(`Query: ${q
+    doc.text(`Subject: ${q.subject}`,10,y); 
+    y+=7;
+    doc.text(`Query: ${q.query}`,10,y); 
+    y+=7;
+    doc.text(`Time: ${q.time}`,10,y); 
+    y+=10;
+
+    // Add new page if content goes beyond bottom margin
+    if(y > 270){ 
+      doc.addPage(); 
+      y = 20; 
+    }
+  });
+
+  // Save the PDF file
+  doc.save("Tushar_Work_Queries.pdf");
+}
+</script>
+</body>
+</html>
